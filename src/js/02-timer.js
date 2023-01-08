@@ -42,8 +42,8 @@ const timer = {
         clearInterval(intervalId);
         return;
       }
-      const timeComponents = convertMs(timeDifference);
-      console.log(timeComponents);
+      const { days, hours, minutes, seconds } = convertMs(timeDifference);
+      console.log({ days, hours, minutes, seconds });
     }, 1000);
   },
 };
@@ -67,12 +67,17 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 
-function addLeadingZero({ days, hours, minutes, seconds }) {
+function pad(value) {
+  return String(value).padStart(2, '0');
+}
+
+function addLeadingZero(days, hours, minutes, seconds) {
     
-    // daysEl.textContent = days;
-    // hoursEl.textContent = hours;
-    // minutesEl.textContent = minutes;
-    // secondsEl.textContent = seconds;
+    daysEl.textContent = pad(days);
+    hoursEl.textContent = pad(hours);
+    minutesEl.textContent = pad(minutes);
+    secondsEl.textContent = pad(seconds);
+    return;
 }
 
 
