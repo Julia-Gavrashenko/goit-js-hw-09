@@ -10,17 +10,17 @@ const inputEl = document.querySelector(`#datetime-picker`);
 const startBtn = document.querySelector(`button[data-start]`);
 const timerEl = document.querySelector(`timer`);
 
-const date = Date.now();
-let intervalId = null;
+
 
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
+
   onClose(selectedDates) {
     console.log(selectedDates[0]);
-    if (selectedDates[0] <= date) {
+    if (selectedDates[0] <= defaultDate) {
       window.alert('Please choose a date in the future');
       startBtn.disabled = true;
       return;
@@ -30,28 +30,46 @@ const options = {
 };
 
 const calendar = flatpickr(inputEl, options);
+let intervalId = null;
+
+startBtn.addEventListener(`click`, onStartBtnClick);
+function onStartBtnClick() {
+  timer.start();
+}
 
 const timer = {
   start() {
     intervalId = setInterval(() => {
       startBtn.disabled = true;
       const selectedDate = calendar.selectedDates[0];
-      const currentDate = Date.now();
+      const currentDate = calendar.defaultDate;
       const timeDifference = selectedDate - currentDate;
+
+      
+
       if (timeDifference <= 0) {
         clearInterval(intervalId);
         return;
       }
-      const { days, hours, minutes, seconds } = convertMs(timeDifference);
-      console.log({ days, hours, minutes, seconds });
+      const { days, hours, minutes, seconds } = convertMs(timeDifference);  
+      console.log(`${days} : ${hours} : ${minutes} : ${seconds}`);
     }, 1000);
   },
 };
 
-startBtn.addEventListener(`click`, onStartBtnClick);
-function onStartBtnClick() {
-  timer.start();
+
+
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
 }
+
+function timerMarkup({date}) {
+  daysEl.textContent = date.days;
+  hoursEl.textContent = date.hours;
+  minutesEl.textContent = date.minutes;
+  secondsEl.textContent = date.seconds;
+}
+
 
 function convertMs(ms) {
   const second = 1000;
@@ -59,25 +77,10 @@ function convertMs(ms) {
   const hour = minute * 60;
   const day = hour * 24;
 
-  const days = Math.floor(ms / day);
-  const hours = Math.floor((ms % day) / hour);
-  const minutes = Math.floor(((ms % day) % hour) / minute);
-  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+  const days = addLeadingZero(Math.floor(ms / day));
+  const hours = addLeadingZero(Math.floor((ms % day) / hour));
+  const minutes = addLeadingZero(Math.floor(((ms % day) % hour) / minute));
+  const seconds = addLeadingZero(Math.floor((((ms % day) % hour) % minute) / second));
 
   return { days, hours, minutes, seconds };
 }
-
-function pad(value) {
-  return String(value).padStart(2, '0');
-}
-
-function addLeadingZero(days, hours, minutes, seconds) {
-    
-    daysEl.textContent = pad(days);
-    hoursEl.textContent = pad(hours);
-    minutesEl.textContent = pad(minutes);
-    secondsEl.textContent = pad(seconds);
-    return;
-}
-
-
